@@ -2,6 +2,7 @@ import os
 import base64
 from sarvamai import SarvamAI
 from sarvamai.core.api_error import ApiError
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -18,7 +19,8 @@ def textToSpeech(text, output_filename="output.wav"):
     try:
         response = client.text_to_speech.convert(
             text=text,
-            target_language_code="hi-IN",
+            target_language_code="ta-IN",
+            #without this target language the programe gives error
             model="bulbul:v3",
             speaker="shubh"
         )
@@ -46,12 +48,7 @@ def speechToText(audio_filename):
         print("Complete")
         print(f"Text Output:\n{response.transcript}\n")
 
-        # scriptDirectory = os.path.dirname(os.path.abspath(__file__))
-        # baseName = os.path.splitext(os.path.basename(audio_filename))[0]
-        # textFilepath = os.path.join(scriptDirectory, f"{baseName}.txt")
-
-        # with open(textFilepath, "w", encoding="utf-8") as f:
-        #     f.write(response.transcript)
+    
 
     except ApiError as e:
          print(f"API Error: {e.status_code} - {e.body}")
@@ -60,14 +57,30 @@ def speechToText(audio_filename):
     except Exception as e:
          print(f"An unknown error occurred: {e}")
 
+def aiChatbot(text):
+    response = client.chat.completions(
+    model="sarvam-105b",
+    
+    messages=[
+        {"role": "user", "content": userQuestion}
+    ]
+)
+    print(response.choices[0].message.content)
+
+    
+    
+    
+
+
 if __name__ == "__main__":
     while True:
         print("\nSpeech & Text Converter using Sarvam AI")
         print("Press 1 for Text to Speech")
         print("Press 2 for Speech to Text")
-        print("Press 3 for Exit")
+        print("Press 3 for using AI Chatbot")
+        print("Press 4 for Exit")
 
-        choice = input("Enter your choice 1, 2 or 3: ").strip()
+        choice = input("Enter your choice 1, 2, 3 or 4: ").strip()
 
         if choice == '1':
             user_text = input("\nEnter the text you want to convert: ")
@@ -86,8 +99,17 @@ if __name__ == "__main__":
             speechToText(file_path)
 
         elif choice == '3':
+            userQuestion = input("\nAsk me anything: ").strip()
+            aiChatbot(userQuestion)
+
+
+        elif choice == '4':
             print("Exiting program")
             break
 
         else:
-            print("Invalid choice Please enter 1, 2 or 3.")
+            print("Invalid choice Please enter 1, 2, 3 or 4.")
+
+
+
+
